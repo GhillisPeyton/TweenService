@@ -34,3 +34,8 @@ To end the tween prematurely,
 Tween.StopTween()
 this will do nothing if the tween is dead.
 
+#Wait()
+if you want to wait for the tween to finish, use 
+Tween.Wait()
+
+if the program ends, the tween will end too, so if you want to halt the programs end until the tween finishes use this
