@@ -1,12 +1,12 @@
 #this is for TweenService library, to tween values with easing styles
-from time import sleep
-import math
-import EasingStyles
 
+from time import sleep
+import EasingStyles
+import threading
 
 class TweenObject():
     
-    def __init__(self,time,FinalDimension,Callback,StartValue = 0, style = 'Linear',direction='In',interval =000.1):
+    def __init__(self,time,FinalDimension,Callback,OnFinish = None,StartValue = 0, style = 'Linear',direction='In',interval =.001):
         self.style = style
         self.time = time
         self.FinalDimension = FinalDimension
@@ -15,19 +15,37 @@ class TweenObject():
         self.Callback = Callback
         self.CurrentValue  = StartValue
         self.StartValue = StartValue
+        self.OnFinish = OnFinish
+        self.CurrentThread = None
+        self.StopCondition = False
 
-    def Tween(self):
+    def ProccessTween(self):
         StyleFunction = EasingStyles.GetEasingStyle(self.style,self.direction)
-
-        TweenCounter = 0 
         TimeMultiplier = self.time / self.interval
-        print(TimeMultiplier)
-        for i in range(int(TimeMultiplier+1)):
-            
+    
+        for i in range(int(TimeMultiplier+1)):      
+            if self.StopCondition:
+                break
+
             newVal = EasingStyles.lerp(self.StartValue,self.FinalDimension,StyleFunction(i/TimeMultiplier))
             self.Callback(newVal)
             self.CurrentValue = newVal
-            print(f'I:{i} {newVal}')
+            
             sleep(self.interval)
 
+        if self.OnFinish:
+            self.OnFinish(self.CurrentValue)
 
+    def StartTween(self):
+        self.CurrentThread = threading.Thread(target=self.ProccessTween,daemon= True)
+        self.CurrentThread.start()
+
+        return self.CurrentThread
+      
+    def StopTween(self):
+        self.StopCondition = True
+
+        
+        
+
+        
