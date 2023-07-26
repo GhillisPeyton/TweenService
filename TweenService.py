@@ -1,7 +1,7 @@
 #this is for TweenService library, to tween values with easing styles
 
 from time import sleep
-import EasingStyles
+from TweenService import EasingStyles
 import threading
 
 class TweenObject():
@@ -18,6 +18,7 @@ class TweenObject():
         self.OnFinish = OnFinish
         self.CurrentThread = None
         self.StopCondition = False
+        self.Finished = False
 
     def ProccessTween(self):
         StyleFunction = EasingStyles.GetEasingStyle(self.style,self.direction)
@@ -32,7 +33,7 @@ class TweenObject():
             self.CurrentValue = newVal
             
             sleep(self.interval)
-
+        self.Finished = True
         if self.OnFinish:
             self.OnFinish(self.CurrentValue)
 
@@ -44,6 +45,10 @@ class TweenObject():
       
     def StopTween(self):
         self.StopCondition = True
+
+    def Wait(self):
+        while not self.Finished:
+            sleep(.01)
 
         
         
